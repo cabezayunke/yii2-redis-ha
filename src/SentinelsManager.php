@@ -1,6 +1,6 @@
 <?php
 
-namespace pyurin\yii\redisHa;
+namespace cabezayunke\yii\redisHa;
 
 use yii\db\Exception;
 
@@ -8,16 +8,17 @@ class SentinelsManager {
 
 	/**
 	 * Facade function for interraction with sentinel.
-	 * 
+	 *
 	 * Connects to sentinels (iterrates them if ones fail) and asks for master server address.
-	 * 
+	 *
 	 * @return array [host,port] address of redis master server or throws exception.
 	 **/
-	function discoverMaster ($sentinels, $masterName) {
+	function discoverMaster ($sentinels, $masterName, $sentinelsPassword = null) {
 		foreach ($sentinels as $sentinel) {
 			if (is_scalar($sentinel)) {
 				$sentinel = [
-						'hostname' => $sentinel
+						'hostname' => $sentinel,
+                        'port' => 26379
 				];
 			}
 			$connection = new SentinelConnection();
@@ -28,6 +29,10 @@ class SentinelsManager {
 			}
 			$connection->connectionTimeout = isset($sentinel['connectionTimeout']) ? $sentinel['connectionTimeout'] : null;
 			$connection->unixSocket = isset($sentinel['unixSocket']) ? $sentinel['unixSocket'] : null;
+			if(!empty($sentinelsPassword)) {
+                \Yii::info("Authenticating against sentinel", __METHOD__);
+                $connection->authenticate($sentinelsPassword);
+            }
 			$r = $connection->getMaster();
 			if (isset($sentinel['hostname'])) {
 				$connectionName = "{$connection->hostname}:{$connection->port}";

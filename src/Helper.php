@@ -1,6 +1,6 @@
 <?php
 
-namespace pyurin\yii\redisHa;
+namespace cabezayunke\yii\redisHa;
 
 use Yii;
 
@@ -16,20 +16,20 @@ class Helper {
 		foreach ($params as $arg) {
 			$command .= '$' . mb_strlen($arg, '8bit') . "\r\n" . $arg . "\r\n";
 		}
-		
-		
+
+
 		Yii::trace("Executing redis Command: {$name} " . (isset($params[1]) ? $params[1] : null), __METHOD__);
 		fwrite($socket, $command);
-		
+
 		$result = static::parseResponse(implode(' ', $params), $socket);
-		
+
 		Yii::endProfile("Execute command $name", __CLASS__);
 		return $result;
 	}
 
 	/**
 	 *
-	 * @param string $command        	
+	 * @param string $command
 	 * @return mixed
 	 * @throws Exception on error
 	 */
@@ -64,7 +64,7 @@ class Helper {
 					$data .= $block;
 					$length -= mb_strlen($block, '8bit');
 				}
-				
+
 				return mb_substr($data, 0, - 2, '8bit');
 			case '*': // Multi-bulk replies
 				$count = (int) $line;
@@ -72,7 +72,7 @@ class Helper {
 				for ($i = 0; $i < $count; $i ++) {
 					$data[] = static::parseResponse($command, $socket);
 				}
-				
+
 				return $data;
 			default:
 				throw new \Exception('Received illegal data from redis: ' . $line . "\nRedis command was: " . $command);

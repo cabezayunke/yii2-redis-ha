@@ -1,6 +1,6 @@
 <?php
 
-namespace pyurin\yii\redisHa;
+namespace cabezayunke\yii\redisHa;
 
 use yii\db\Exception;
 use Yii;
@@ -9,11 +9,25 @@ class Connection extends \yii\redis\Connection {
 
 	/**
 	 * List of sentinel servers like that:
-	 * ['host1','host2']
+	 * [
+     *  [
+     *      $host => 'host1',
+     *      $port => 'port1'
+     *  ],
+     * [
+     *      $host => 'host2',
+     *      $port => 'port2'
+     *  ]
+     * ]
 	 **/
 	public $sentinels = null;
 
-	/**
+    /**
+     * Password for sentinels, might be different to servers
+     */
+    public $sentinelsPassword = null;
+
+    /**
 	 * Redis server hostname, should not be modified from outside
 	 **/
 	public $hostname = null;
@@ -28,7 +42,7 @@ class Connection extends \yii\redis\Connection {
 	 * @var resource redis socket connection
 	 */
 	protected $_socket;
-	
+
 	/**
 	 * Name of master
 	 */
@@ -57,7 +71,7 @@ class Connection extends \yii\redis\Connection {
 			throw new Exception("Sentinels must be set");
 		}
 		$this->hostname = $this->unixSocket = $this->port = null;
-		list ($this->hostname, $this->port) = (new SentinelsManager())->discoverMaster($this->sentinels, $this->masterName);
+		list ($this->hostname, $this->port) = (new SentinelsManager())->discoverMaster($this->sentinels, $this->masterName, $this->sentinelsPassword);
 		$connection = ($this->unixSocket ?  : $this->hostname . ':' . $this->port) . ', database=' . $this->database;
 		Yii::trace('Opening redis DB connection: ' . $connection, __METHOD__);
 		Yii::beginProfile("Connect to redis master", __CLASS__);

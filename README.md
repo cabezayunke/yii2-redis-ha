@@ -1,3 +1,12 @@
+Additions on top of original repo
+---------------------------------------------
+custom port and password por sentinels
+
+TODO: testing
+
+Original README below
+
+
 Client for redis Highly Available set for Yii2
 =============================================
 This Yii2 component is based on core yii2-redis component https://github.com/yiisoft/yii2-redis but gives ability to work with master-slave redis clusters with sentiels. <br />
@@ -57,10 +66,13 @@ Basic example:
 				'session' => [
 						'class' => '\yii\redis\Session',
 						'redis' => [
-							'class' => '\pyurin\yii\redisHa\Connection',
+							'class' => '\cabezayunke\yii\redisHa\Connection',
 							'masterName' => 'mymaster',
 							'sentinels' => [
-									'localhost'
+									[
+                                        'hostname' => 'localhost',
+                                        'port' => 26379
+                                    ]
 							]
 						]
 				],
@@ -72,6 +84,6 @@ Installation
 Available with composer:
 ```
   "require" : {
-    "pyurin/yii2-redis-ha":"*"
+    "cabezayunke/yii2-redis-ha":"*"
   },
 ```
