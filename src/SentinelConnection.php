@@ -14,6 +14,8 @@ class SentinelConnection {
 
 	public $connectionTimeout;
 
+	public $password = null;
+
 	/**
 	 * Deprecated. Redis sentinel does not work on unix socket
 	 **/
@@ -37,6 +39,10 @@ class SentinelConnection {
 			if ($this->connectionTimeout !== null) {
 				stream_set_timeout($this->_socket, $timeout = (int) $this->connectionTimeout, (int) (($this->connectionTimeout - $timeout) * 1000000));
 			}
+            if ($this->password !== null) {
+                \Yii::info("Authenticating with sentinel password", __METHOD__);
+                $this->authenticate();
+            }
 			return true;
 		} else {
 			\Yii::warning('Failed opening redis sentinel connection: ' . $connection, __METHOD__);
@@ -66,10 +72,10 @@ class SentinelConnection {
      *
      * @param $sentinelsPassword
      */
-	function authenticate ($sentinelsPassword) {
+	function authenticate () {
         if ($this->open()) {
             return Helper::executeCommand('AUTH', [
-                $sentinelsPassword
+                $this->password
             ], $this->_socket);
         } else {
             return false;

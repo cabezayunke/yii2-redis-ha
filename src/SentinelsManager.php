@@ -14,8 +14,13 @@ class SentinelsManager {
 	 * @return array [host,port] address of redis master server or throws exception.
 	 **/
 	function discoverMaster ($sentinels, $masterName, $sentinelsPassword = null) {
-		foreach ($sentinels as $sentinel) {
-			if (is_scalar($sentinel)) {
+        \Yii::info("Discovering master $masterName", __METHOD__);
+
+        foreach ($sentinels as $sentinel) {
+            \Yii::info("Sentinel:", __METHOD__);
+            \Yii::info($sentinel, __METHOD__);
+
+            if (is_scalar($sentinel)) {
 				$sentinel = [
 						'hostname' => $sentinel,
                         'port' => 26379
@@ -25,13 +30,13 @@ class SentinelsManager {
 			$connection->hostname = isset($sentinel['hostname']) ? $sentinel['hostname'] : null;
 			$connection->masterName = $masterName;
 			if (isset($sentinel['port'])) {
-				$connection->port = $sentinel['port'];
+                \Yii::info("Setting custom sentinel port: ${$sentinel['port']}", __METHOD__);
+                $connection->port = $sentinel['port'];
 			}
 			$connection->connectionTimeout = isset($sentinel['connectionTimeout']) ? $sentinel['connectionTimeout'] : null;
 			$connection->unixSocket = isset($sentinel['unixSocket']) ? $sentinel['unixSocket'] : null;
 			if(!empty($sentinelsPassword)) {
-                \Yii::info("Authenticating against sentinel", __METHOD__);
-                $connection->authenticate($sentinelsPassword);
+			    $connection->password = $sentinelsPassword;
             }
 			$r = $connection->getMaster();
 			if (isset($sentinel['hostname'])) {
