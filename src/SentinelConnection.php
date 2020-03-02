@@ -28,7 +28,7 @@ class SentinelConnection {
 	 **/
 	protected function open () {
 		if ($this->_socket !== null) {
-			return;
+			return false;
 		}
 		$connection = ($this->unixSocket ?  : $this->hostname . ':' . $this->port);
 		Yii::trace('Opening redis sentinel connection: ' . $connection, __METHOD__);

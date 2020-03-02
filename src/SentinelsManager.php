@@ -28,11 +28,8 @@ class SentinelsManager {
 			}
 			$connection = new SentinelConnection();
 			$connection->hostname = isset($sentinel['hostname']) ? $sentinel['hostname'] : null;
-			$connection->masterName = $masterName;
-			if (isset($sentinel['port'])) {
-                \Yii::info("Setting custom sentinel port: ${$sentinel['port']}", __METHOD__);
-                $connection->port = $sentinel['port'];
-			}
+            $connection->port = isset($sentinel['port']) ? (int) $sentinel['port'] : 26379;
+            $connection->masterName = $masterName;
 			$connection->connectionTimeout = isset($sentinel['connectionTimeout']) ? $sentinel['connectionTimeout'] : null;
 			$connection->unixSocket = isset($sentinel['unixSocket']) ? $sentinel['unixSocket'] : null;
 			if(!empty($sentinelsPassword)) {
